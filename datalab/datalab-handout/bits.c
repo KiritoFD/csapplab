@@ -94,7 +94,13 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-  return 2;
+  int flag1 = !((x & 0xa) ^ 0xa);//x & 0xa == 0xa
+  //也就是第一位和第三位都是1，大于10
+  int flag2 = !((x & 0xc) ^ 0xc);
+  //第二位和第三位都是1，大于12
+  int flg3 = ((x>>4)^3) ; //如果x的高四位是0011，也就是3
+  return !(flag1 | flag2 | flg3); //如果x的高四位是0011，也就是3
+  //也就是x的高四位是0011，或者x的第一位和第三位都是1，或者x的第二位和第三位都是1
 }
 /* 
  * conditional - same as x ? y : z 
@@ -104,7 +110,9 @@ int isAsciiDigit(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  return 2;
+  int neg = ~0;//-1
+  int mask = !!x + neg;//如果x为0，那么mask为-1，如果x不为0，那么mask为0
+  return (y & ~mask) | (z & mask);
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
@@ -114,7 +122,16 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+    //符号位
+  int s1 = x >> 31;
+  int s2 = y >> 31;
+  //s1 == s2 ? 1 : 0
+  int mask = !(s1 ^ s2);
+  int diff = y + (~x) +1;
+  int flag2 = !(diff >> 31); //如果diff的符号位是0，那么x <= y
+  //如果符号位相同，那么就比较差值的符号位
+  //如果符号位不同，那么就比较符号位
+  return (mask & flag2) | (!mask & (s1&1));
 }
 //4
 /* 
@@ -126,7 +143,12 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4 
  */
 int logicalNeg(int x) {
-  return 2;
+  //判断是不是0
+  int tag = x | (~x + 1); //如果x是0，那么tag就是0;x和-x，只有0会得到-1
+  //如果x是最小值，那么tag就是1
+  int s = tag >> 31; //如果x是0，那么s就是0，如果x是最小值，那么s就是1
+
+  return s+1;
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
@@ -141,6 +163,9 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
+  int mask, y, tag16, tag8, tag4, tag2, tag1, has16bit, has8bit, has4bit, has2bit, has1bit;
+  mask = x >> 31; //符号位
+  y = mask &(~x) | (~mask & x); //如果x是负数，那么y就是-x，如果x是正数，那么y就是x
   return 0;
 }
 //float
